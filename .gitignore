@@ -1,0 +1,28 @@
+# Virtual Environment
+venv/
+env/
+
+# Python cache
+__pycache__/
+*.pyc
+
+# Jupyter / Colab
+.ipynb_checkpoints/
+
+# VS Code
+.vscode/
+
+# macOS
+.DS_Store
+
+# Flask uploads
+uploads/
+
+# TensorFlow logs
+logs/
+
+# Environment variables
+.env
+
+# System files
+Thumbs.db

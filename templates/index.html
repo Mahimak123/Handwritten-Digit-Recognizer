@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NeuralDigit AI • Advanced Handwritten Digit Recognizer</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+    <!-- FontAwesome for Premium Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Custom Style Sheet -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body class="dark-theme">
+
+    <!-- Background Space Particles -->
+    <div id="particles"></div>
+    <!-- Ambient Cursor Glow Effect -->
+    <div class="cursor-glow"></div>
+
+    <!-- Header / Brand Section -->
+    <header class="app-header">
+        <div class="brand">
+            <div class="brand-icon"><i class="fa-solid fa-brain"></i></div>
+            <div class="brand-text">
+                <h1>NeuralDigit <span class="accent-text">AI</span></h1>
+                <span class="version-tag">v2.0.0 Pro</span>
+            </div>
+        </div>
+        <div class="header-controls">
+            <button id="sound-toggle" class="control-btn active" title="Toggle Sound Feedback" onclick="toggleSound()">
+                <i class="fa-solid fa-volume-high"></i>
+            </button>
+            <button id="theme-btn" class="control-btn" title="Toggle Theme Mode" onclick="toggleTheme()">
+                <i class="fa-solid fa-moon"></i>
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Dashboard Workspace -->
+    <main class="dashboard-container">
+        
+        <!-- Left Panel: Creative Canvas & Controls -->
+        <section class="panel canvas-panel">
+            <div class="panel-header">
+                <h2><i class="fa-solid fa-pen-fancy"></i> Drawing Board</h2>
+                <p>Draw any single digit from 0 to 9 in the center of the canvas</p>
+            </div>
+            
+            <div class="canvas-viewport">
+                <div class="scan-line"></div>
+                <div class="grid-overlay"></div>
+                <canvas id="canvas" width="280" height="280"></canvas>
+            </div>
+
+            <!-- Drawing Telemetry Controls -->
+            <div class="canvas-controls">
+                <div class="control-group">
+                    <label for="brush-slider">
+                        <span><i class="fa-solid fa-paint-brush"></i> Brush Size</span>
+                        <span id="brush-val" class="badge">20px</span>
+                    </label>
+                    <input type="range" id="brush-slider" min="12" max="36" value="20" class="premium-slider">
+                </div>
+
+                <div class="control-actions">
+                    <button class="btn btn-secondary" onclick="clearCanvas()">
+                        <i class="fa-solid fa-trash-can"></i> Clear Board
+                    </button>
+                    <button class="btn btn-primary" onclick="predictDigit()">
+                        <i class="fa-solid fa-wand-magic-sparkles"></i> Predict Output
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Right Panel: Telemetry & Machine Learning Analytics -->
+        <section class="panel analytics-panel">
+            <div class="panel-header">
+                <h2><i class="fa-solid fa-chart-line"></i> AI Telemetry & Predictions</h2>
+                <p>Real-time neural network probabilities and performance logs</p>
+            </div>
+
+            <!-- Real-time Cropped Feed Visualizer -->
+            <div class="analytics-card feed-card">
+                <div class="feed-header">
+                    <span><i class="fa-solid fa-eye"></i> Preprocessed Feed (28x28)</span>
+                    <span class="info-tooltip" title="This is exactly how the neural network sees your input after grayscaling and down-scaling."><i class="fa-solid fa-circle-info"></i></span>
+                </div>
+                <div class="feed-body">
+                    <div class="preview-box">
+                        <canvas id="preview-canvas" width="28" height="28"></canvas>
+                    </div>
+                    <div class="feed-specs">
+                        <div class="spec-row">
+                            <span class="spec-label">Input Shape</span>
+                            <span class="spec-val">1x28x28x1</span>
+                        </div>
+                        <div class="spec-row">
+                            <span class="spec-label">Normalizer</span>
+                            <span class="spec-val">/ 255.0</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Primary Prediction Display -->
+            <div class="analytics-card prediction-card">
+                <div class="prediction-main">
+                    <div class="result-number-container">
+                        <div class="loading-ring" id="loading"></div>
+                        <span id="result">-</span>
+                    </div>
+                    <div class="prediction-label">Recognized Digit</div>
+                </div>
+                
+                <!-- Micro telemetry -->
+                <div class="telemetry-grid">
+                    <div class="telemetry-item">
+                        <span class="telemetry-title">Inference Engine</span>
+                        <span class="telemetry-value" id="engine-type">TFLite</span>
+                    </div>
+                    <div class="telemetry-item">
+                        <span class="telemetry-title">Response Time</span>
+                        <span class="telemetry-value" id="response-time">0 ms</span>
+                    </div>
+                    <div class="telemetry-item">
+                        <span class="telemetry-title">Main Confidence</span>
+                        <span class="telemetry-value" id="confidence-percentage">0%</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Probability Bar Distribution Chart -->
+            <div class="analytics-card probability-card">
+                <h3><i class="fa-solid fa-square-poll-horizontal"></i> Confidence Distribution</h3>
+                <div class="probability-bars" id="prob-bars-container">
+                    <div class="no-data-placeholder">
+                        <i class="fa-solid fa-chart-bar"></i>
+                        <p>Draw and predict to view confidence distribution</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+    </main>
+
+    <!-- Professional Footer -->
+    <footer class="app-footer">
+        <p>Powered by <span class="tag font-highlight">TFLite Runtime</span> &bull; <span class="tag font-highlight">Flask Python</span> &bull; <span class="tag font-highlight">OpenCV</span> &bull; <span class="tag font-highlight">Gunicorn</span></p>
+        <p class="copyright">&copy; 2026 NeuralDigit AI. Optimized for Render Deployment.</p>
+    </footer>
+
+    <!-- Sci-Fi Chime Prediction Sound -->
+    <audio id="predict-sound" preload="auto">
+        <source src="https://assets.mixkit.co/active_storage/sfx/2019/2019-preview.mp3" type="audio/mpeg">
+    </audio>
+
+    <!-- Core Script -->
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>
